@@ -593,14 +593,14 @@ def inject_hyperparams(
           count, hparams, inner_factory(**other_hps, **hparams).init(params))
 
     def update_fn(updates, state, params=None):
-      count_inc = numerics.safe_int32_increment(state.count)
       dtype = getattr(next(iter(
           jax.tree_util.tree_leaves(updates)), None), 'dtype', None)
       hparams = {k: _convert_floats(v, dtype)
                  for k, v in state.hyperparams.items()}
-      hparams.update(schedule_fn(count_inc, dtype))
+      hparams.update(schedule_fn(state.count, dtype))
       updates, inner_state = inner_factory(**other_hps, **hparams).update(
           updates, state.inner_state, params)
+      count_inc = numerics.safe_int32_increment(state.count)
 
       # pylint:disable=too-many-function-args
       return updates, InjectHyperparamsState(count_inc, hparams, inner_state)
