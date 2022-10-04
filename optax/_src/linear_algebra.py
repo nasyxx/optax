@@ -71,9 +71,11 @@ def power_iteration(
             jnp.greater(jnp.abs(s_new - s), error_tolerance))
 
   # Figure out how to use step as seed for random.
+
+  # Figure out how to use step as seed for random.
   v_0 = np.random.uniform(-1.0, 1.0, matrix_size).astype(matrix.dtype)
 
-  init_state = tuple([0, v_0, jnp.zeros([], dtype=matrix.dtype), v_0, True])
+  init_state = 0, v_0, jnp.zeros([], dtype=matrix.dtype), v_0, True
   _, v_out, s_out, _, _ = lax.while_loop(
       _iter_condition, _iter_body, init_state)
   v_out = v_out / jnp.linalg.norm(v_out)
@@ -191,8 +193,7 @@ def matrix_inverse_pth_root(
     new_mat_m_0 = damped_matrix * z
     new_error = jnp.max(jnp.abs(new_mat_m_0 - identity))
     new_mat_h_0 = identity * jnp.power(z, 1.0 / p)
-    init_state = tuple(
-        [0, new_mat_m_0, new_mat_h_0, new_mat_h_0, new_error, True])
+    init_state = 0, new_mat_m_0, new_mat_h_0, new_mat_h_0, new_error, True
     _, mat_m, mat_h, old_mat_h, error, convergence = lax.while_loop(
         _iter_condition, _iter_body, init_state)
     error = jnp.max(jnp.abs(mat_m - identity))

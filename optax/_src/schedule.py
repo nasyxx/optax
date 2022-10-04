@@ -228,7 +228,7 @@ def cosine_decay_schedule(
   Returns:
     schedule: A function that maps step counts to values.
   """
-  if not decay_steps > 0:
+  if decay_steps <= 0:
     raise ValueError('The cosine_decay_schedule requires positive decay_steps!')
 
   def schedule(count):
@@ -276,7 +276,7 @@ def piecewise_interpolate_schedule(
 
   if boundaries_and_scales:
     boundaries, scales = zip(*sorted(boundaries_and_scales.items()))
-    if not all(scale >= 0. for scale in scales):
+    if any(scale < 0.0 for scale in scales):
       raise ValueError(
           '`piecewise_interpolate_schedule` expects non-negative scale factors')
   else:
@@ -371,8 +371,11 @@ def cosine_onecycle_schedule(
   return piecewise_interpolate_schedule(
       'cosine',
       peak_value / div_factor,
-      {int(pct_start * transition_steps): div_factor,
-       int(transition_steps): 1. / (div_factor * final_div_factor)})
+      {
+          int(pct_start * transition_steps): div_factor,
+          transition_steps: 1.0 / (div_factor * final_div_factor),
+      },
+  )
 
 
 def join_schedules(schedules: Sequence[base.Schedule],

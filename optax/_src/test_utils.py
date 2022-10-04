@@ -23,7 +23,7 @@ def find_internal_python_modules(
     root_module: types.ModuleType,
 ) -> Sequence[Tuple[str, types.ModuleType]]:
   """Returns `(name, module)` for all Optax submodules under `root_module`."""
-  modules = set([(root_module.__name__, root_module)])
+  modules = {(root_module.__name__, root_module)}
   visited = set()
   to_visit = [root_module]
 
@@ -33,10 +33,9 @@ def find_internal_python_modules(
 
     for name in dir(mod):
       obj = getattr(mod, name)
-      if inspect.ismodule(obj) and obj not in visited:
-        if obj.__name__.startswith('optax'):
-          if '_src' not in obj.__name__:
-            to_visit.append(obj)
-            modules.add((obj.__name__, obj))
+      if (inspect.ismodule(obj) and obj not in visited
+          and obj.__name__.startswith('optax') and '_src' not in obj.__name__):
+        to_visit.append(obj)
+        modules.add((obj.__name__, obj))
 
   return sorted(modules)

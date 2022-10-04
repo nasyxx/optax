@@ -349,13 +349,13 @@ class MultiSteps:
     updates = _zeros_tree_like(params)
     gradient_step = jnp.zeros([], dtype=jnp.int32)
     _, skip_state = self._should_skip_update_fn(updates, gradient_step, params)
-    init_state = MultiStepsState(
+    return MultiStepsState(
         mini_step=jnp.zeros([], dtype=jnp.int32),
         gradient_step=gradient_step,
         inner_opt_state=self._opt.init(params),
         acc_grads=updates,
-        skip_state=skip_state)
-    return init_state
+        skip_state=skip_state,
+    )
 
   def update(self,
              updates: base.Updates,

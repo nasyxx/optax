@@ -27,7 +27,7 @@ def optax_public_symbols():
   names = set()
   for module_name, module in test_utils.find_internal_python_modules(optax):
     for name in module.__all__:
-      names.add(module_name + "." + name)
+      names.add(f"{module_name}.{name}")
   return names
 
 
@@ -44,8 +44,7 @@ class OptaxCoverageCheck(builders.Builder):
 
   def finish(self) -> None:
     documented_objects = frozenset(self.env.domaindata["py"]["objects"])
-    undocumented_objects = set(optax_public_symbols()) - documented_objects
-    if undocumented_objects:
+    if undocumented_objects := set(optax_public_symbols()) - documented_objects:
       undocumented_objects = tuple(sorted(undocumented_objects))
       raise errors.SphinxError(
           "All public symbols must be included in our documentation, did you "

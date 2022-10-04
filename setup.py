@@ -25,8 +25,7 @@ def _get_version():
   with open(os.path.join(_CURRENT_DIR, 'optax', '__init__.py')) as fp:
     for line in fp:
       if line.startswith('__version__') and '=' in line:
-        version = line[line.find('=') + 1:].strip(' \'"\n')
-        if version:
+        if version := line[line.find('=') + 1:].strip(' \'"\n'):
           return version
     raise ValueError('`__version__` not defined in `optax/__init__.py`')
 
