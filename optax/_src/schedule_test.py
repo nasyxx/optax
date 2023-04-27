@@ -41,10 +41,7 @@ class ConstantTest(chex.TestCase):
     num_steps = 15
     schedule_fn = self.variant(schedule.constant_schedule(const_value))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(num_steps):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(num_steps)]
     # Test output.
     expected_vals = np.array([const_value] * num_steps, dtype=np.float32)
     np.testing.assert_allclose(
@@ -61,10 +58,7 @@ class PolynomialTest(chex.TestCase):
         schedule.polynomial_schedule(
             init_value=10., end_value=20., power=1, transition_steps=10))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(15):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(15)]
     # Test output.
     expected_vals = np.array(list(range(10, 20)) + [20] * 5, dtype=np.float32)
     np.testing.assert_allclose(
@@ -92,10 +86,7 @@ class PolynomialTest(chex.TestCase):
         schedule.polynomial_schedule(
             init_value=25., end_value=10., power=2, transition_steps=10))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(15):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(15)]
     # Test output.
     expected_vals = np.array(
         [10. + 15. * (1. - n / 10)**2 for n in range(10)] + [10] * 5,
@@ -112,10 +103,7 @@ class PolynomialTest(chex.TestCase):
             init_value=30., end_value=10., power=2,
             transition_steps=10, transition_begin=4))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(20):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(20)]
     # Test output.
     expected_vals = np.array(
         [30.] * 4 + [10. + 20. * (1. - n / 10)**2 for n in range(10)] +
@@ -134,10 +122,7 @@ class PiecewiseConstantTest(chex.TestCase):
     schedule_fn = self.variant(
         schedule.piecewise_constant_schedule(0.1, {3: 2., 6: 0.5}))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(10):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(10)]
     # Test output.
     expected_vals = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1])
     np.testing.assert_allclose(
@@ -150,10 +135,7 @@ class PiecewiseConstantTest(chex.TestCase):
     schedule_fn = self.variant(
         schedule.piecewise_constant_schedule(-0.1, {3: 2., 6: 0.5}))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(10):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(10)]
     # Test output.
     expected_vals = -1 * np.array(
         [0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1])
@@ -175,9 +157,7 @@ class ExponentialTest(chex.TestCase):
             init_value=init_value, transition_steps=num_steps,
             decay_rate=1., staircase=staircase))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(num_steps):
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(num_steps)]
     expected_vals = np.array([init_value] * num_steps, dtype=np.float32)
     np.testing.assert_allclose(
         expected_vals, np.array(generated_vals), atol=1e-3)
@@ -312,10 +292,7 @@ class CosineDecayTest(chex.TestCase):
     schedule_fn = self.variant(
         schedule.cosine_decay_schedule(initial_value, 10, 0.0))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(10):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
+    generated_vals = [schedule_fn(count) for count in range(10)]
     # Test output.
     expected_multipliers = np.array(
         0.5 + 0.5 * np.cos(
@@ -332,11 +309,7 @@ class CosineDecayTest(chex.TestCase):
     schedule_fn = self.variant(
         schedule.cosine_decay_schedule(initial_value, 5, 0.0))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(12):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
-
+    generated_vals = [schedule_fn(count) for count in range(12)]
     # Test output.
     expected_multipliers = np.array(
         0.5 + 0.5 * np.cos(
@@ -354,11 +327,7 @@ class CosineDecayTest(chex.TestCase):
     schedule_fn = self.variant(
         schedule.cosine_decay_schedule(initial_value, 5, 0.1))
     # Test that generated values equal the expected schedule values.
-    generated_vals = []
-    for count in range(12):
-      # Compute next value.
-      generated_vals.append(schedule_fn(count))
-
+    generated_vals = [schedule_fn(count) for count in range(12)]
     # Test output.
     expected_multipliers = np.array(
         0.5 + 0.5 * np.cos(
@@ -433,10 +402,15 @@ class SGDRTest(chex.TestCase):
       ('without step_decay', 1.6, 1.6, 1.6),)
   def test_limits(self, lr0, lr1, lr2):
     """Check cosine schedule decay for the entire training schedule."""
-    lr_kwargs = []
-    for step, lr in zip([2e3, 3e3, 5e3], [lr0, lr1, lr2]):
-      lr_kwargs += [dict(decay_steps=int(step), peak_value=lr,
-                         init_value=0, end_value=0.0, warmup_steps=500)]
+    lr_kwargs = [
+        dict(
+            decay_steps=int(step),
+            peak_value=lr,
+            init_value=0,
+            end_value=0.0,
+            warmup_steps=500,
+        ) for step, lr in zip([2e3, 3e3, 5e3], [lr0, lr1, lr2])
+    ]
     schedule_fn = self.variant(schedule.sgdr_schedule(lr_kwargs))
     np.testing.assert_allclose(lr0, schedule_fn(500))
     np.testing.assert_allclose(lr1, schedule_fn(2500))

@@ -379,7 +379,7 @@ class CTCTest(parameterized.TestCase):
     logprobs = jax.nn.log_softmax(logits)
 
     labels = []
-    for n in range(batch_size):
+    for _ in range(batch_size):
       row = list(range(1, nclasses))
       np.random.shuffle(row)
       labels.append(row[:steps])

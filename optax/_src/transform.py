@@ -96,12 +96,11 @@ def update_moment_per_elem_norm(updates, moments, decay, order):
   def orderth_norm(g):
     if jnp.isrealobj(g):
       return g ** order
-    else:
-      half_order = order / 2
-      # JAX generates different HLO for int and float `order`
-      if half_order.is_integer():
-        half_order = int(half_order)
-      return _abs_sq(g) ** half_order
+    half_order = order / 2
+    # JAX generates different HLO for int and float `order`
+    if half_order.is_integer():
+      half_order = int(half_order)
+    return _abs_sq(g) ** half_order
 
   return jax.tree_util.tree_map(
       lambda g, t: (1 - decay) * orderth_norm(g) + decay * t, updates, moments)
@@ -1034,10 +1033,7 @@ def scale_by_sm3(
       return coeffs[0]*g**2 + coeffs[1]*functools.reduce(jnp.minimum, v)
 
   def _new_mu(g, i):
-    if g.ndim < 2:
-      return g
-    else:
-      return jnp.max(g, axis=other_axes(i, g.ndim))
+    return g if g.ndim < 2 else jnp.max(g, axis=other_axes(i, g.ndim))
 
   def other_axes(idx, ndim):
     return list(range(idx)) + list(range(idx+1, ndim))

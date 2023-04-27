@@ -76,7 +76,7 @@ def safe_norm(x: chex.Array,
   """
   norm = jnp.linalg.norm(x, ord=ord, axis=axis, keepdims=True)
   x = jnp.where(norm <= min_norm, jnp.ones_like(x), x)
-  norm = jnp.squeeze(norm, axis=axis) if not keepdims else norm
+  norm = norm if keepdims else jnp.squeeze(norm, axis=axis)
   masked_norm = jnp.linalg.norm(x, ord=ord, axis=axis, keepdims=keepdims)
   return jnp.where(norm <= min_norm, min_norm, masked_norm)
 

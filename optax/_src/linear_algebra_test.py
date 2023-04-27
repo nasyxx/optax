@@ -53,9 +53,6 @@ class LinearAlgebraTest(absltest.TestCase):
           ms.astype(np.float32), 4, ridge_epsilon=1e-12)[1]
       if e < 7:
         self.assertLess(error, 0.1)
-      else:
-        # No guarantee of success after e >= 7
-        pass
 
 
 if __name__ == '__main__':

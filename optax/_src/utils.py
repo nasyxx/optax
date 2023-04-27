@@ -34,9 +34,7 @@ def tile_second_to_last_dim(a: chex.Array) -> chex.Array:
 def canonicalize_dtype(
     dtype: Optional[chex.ArrayDType]) -> Optional[chex.ArrayDType]:
   """Canonicalise a dtype, skip if None."""
-  if dtype is not None:
-    return jax.dtypes.canonicalize_dtype(dtype)
-  return dtype
+  return jax.dtypes.canonicalize_dtype(dtype) if dtype is not None else dtype
 
 
 def cast_tree(tree: chex.ArrayTree,

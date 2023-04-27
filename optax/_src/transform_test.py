@@ -148,30 +148,23 @@ class TransformTest(parameterized.TestCase):
 
     transform_fn = self.variant(transform.update_infinity_moment)
 
-    # identity if updating with itself (and positive decay)
     np.testing.assert_allclose(
-        transform_fn(values, values, decay=d, eps=0.),
-        values,
-        atol=1e-4
-    )
-    # return (decayed) max when updating with zeros
+        transform_fn(values, values, d=d, eps=0.0), values, atol=1e-4)
     np.testing.assert_allclose(
-        transform_fn(jnp.zeros_like(values), values, decay=d, eps=0.),
+        transform_fn(jnp.zeros_like(values), values, d=d, eps=0.0),
         d * values,
-        atol=1e-4
+        atol=1e-4,
     )
-    # infinity norm takes absolute values
     np.testing.assert_allclose(
-        transform_fn(-values, jnp.zeros_like(values), decay=d, eps=0.),
+        transform_fn(-values, jnp.zeros_like(values), d=d, eps=0.0),
         values,
-        atol=1e-4
+        atol=1e-4,
     )
-    # return at least `eps`
     np.testing.assert_allclose(
-        transform_fn(jnp.zeros_like(values), jnp.zeros_like(values),
-                     decay=d, eps=1e-2),
+        transform_fn(
+            jnp.zeros_like(values), jnp.zeros_like(values), d=d, eps=1e-2),
         jnp.ones_like(values) * 1e-2,
-        atol=1e-4
+        atol=1e-4,
     )
 
   @chex.all_variants
